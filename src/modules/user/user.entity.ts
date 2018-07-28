@@ -1,10 +1,10 @@
-import { Entity, ObjectID, Column } from 'typeorm';
+import { Entity, ObjectID, Column, ObjectIdColumn } from 'typeorm';
 import { IUser } from './interace';
 
-@Entity('user')
+@Entity({ name: 'users' })
 export class User implements IUser {
 
-  @Column()
+  @ObjectIdColumn()
   id: ObjectID;
 
   @Column()
