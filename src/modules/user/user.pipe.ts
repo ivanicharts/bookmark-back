@@ -7,6 +7,7 @@ export class UserByIdPipe implements PipeTransform<{ id: ObjectID }, Promise<Use
     constructor(private readonly userRepository: UserRepository) {}
 
     transform({ id }) {
+        console.log('from pipe', id);
         return this.userRepository.findOneOrFail(id);
     }
 }

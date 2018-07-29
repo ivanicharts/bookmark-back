@@ -6,6 +6,7 @@ import { User, UserController, UserRepositoryProvider, UserService, UserByIdPipe
 console.log(UserRepositoryProvider, 'UserRepositoryProvider')
 @Module({
     imports: [TypeOrmModule.forFeature([User])],
+    exports: [UserService],
     controllers: [UserController],
     providers: [UserRepositoryProvider, UserService, UserByIdPipe],
 })

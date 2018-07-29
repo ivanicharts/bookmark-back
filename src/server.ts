@@ -14,11 +14,13 @@ async function bootstrap() {
     // logger
   });
 
+  bootstrapSwagger(app);
   // await appBootstrap(app, logger);
   await app.listen((<string>process.env.PORT) || 3000);
 }
 
 function bootstrapSwagger(app: INestApplication) {
+  console.log('qwe', process.env.SWAGGER_ENABLED)
   if (process.env.SWAGGER_ENABLED) {
     const options = new DocumentBuilder()
       .setTitle('Bookmarks app')
@@ -27,7 +29,6 @@ function bootstrapSwagger(app: INestApplication) {
       .addTag('bookmarks')
       .setSchemes(process.env.SWAGGER_SCHEME as 'http' | 'https')
       .build();
-
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('/api/doc', app, document);
   }
