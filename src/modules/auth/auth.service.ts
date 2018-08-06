@@ -6,7 +6,8 @@ import { ILoginEmail, ILoginName, ILoginSuccess } from './interface';
 import { authenticate } from 'passport';
 import { plainToClass } from 'class-transformer';
 
-// todo: replace hardcoded values to env vars
+import * as d from './auth.module';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -50,3 +51,4 @@ export class AuthService {
     return { id, token };
   }
 }
+

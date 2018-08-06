@@ -11,7 +11,7 @@ export class UserController {
     @Get('/list')
     @UseGuards(AuthGuard('jwt'))
     @TransformClassToPlain({ groups: ['read'] })
-    list() {
+    list(): Promise<User[]> {
         return this.userService.list();
     }
 

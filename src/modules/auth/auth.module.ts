@@ -4,7 +4,6 @@ import { JwtStrategy, JwtProvider } from './jwt'
 import { UserModule } from '../user';
 
 
-console.log('LocalStartegy', JwtStrategy)
 @Module({
   imports: [UserModule],
   controllers: [AuthController],

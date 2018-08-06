@@ -45,11 +45,14 @@ export class AuthController {
         @Body(new ValidationPipe({
             ...bodyValidation,
             groups: [LOGIN_NAME],
-        })) credentials: User
+        })) credentials: User,
+        @Res() res,
     ): Promise<ILoginSuccess> {
         const loginSuccess: ILoginSuccess = await this.authService.loginByName(credentials);
 
-        return loginSuccess;
+        console.log('res.cookie', res.cookie);
+        res.cookie('jwt', loginSuccess.token, { httpOnly: true, secure: true });
+        return res.json(loginSuccess);
     }
 
 }
