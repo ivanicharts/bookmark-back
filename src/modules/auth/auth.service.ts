@@ -6,7 +6,6 @@ import { ILoginEmail, ILoginName, ILoginSuccess } from './interface';
 import { authenticate } from 'passport';
 import { plainToClass } from 'class-transformer';
 
-import * as d from './auth.module';
 
 @Injectable()
 export class AuthService {
@@ -39,14 +38,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     
-    const { id } = user;
+    const { id, role } = user;
     const userEntity = plainToClass(User, user);
     
     if (!(await userEntity.validatePassword(password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.createToken({ id });
+    const token = this.createToken({ id, role });
 
     return { id, token };
   }

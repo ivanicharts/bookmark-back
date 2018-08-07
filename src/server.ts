@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { RolesGuard } from './guard';
 // import { appBootstrap } from './app';
 
 // import { LoggerService } from 'platform-common';

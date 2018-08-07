@@ -16,3 +16,9 @@ export interface IUser extends IName, IEmail {
 }
 
 export type TUniqueUserColumns = IName | IEmail;
+
+export enum RoleEnum {
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest',
+}

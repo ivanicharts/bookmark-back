@@ -50,9 +50,7 @@ export class AuthController {
     ): Promise<ILoginSuccess> {
         const loginSuccess: ILoginSuccess = await this.authService.loginByName(credentials);
 
-        console.log('res.cookie', res.cookie);
-        res.cookie('jwt', loginSuccess.token, { httpOnly: true, secure: true });
-        return res.json(loginSuccess);
+        return loginSuccess;
     }
 
 }

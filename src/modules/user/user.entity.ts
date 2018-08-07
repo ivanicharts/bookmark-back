@@ -1,11 +1,10 @@
 import { Entity, ObjectID, Column, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, ColumnOptions, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
-import { IsEmail, IsString, Length, MinLength, IsAlphanumeric } from 'class-validator';
+import { IsEmail, IsString, Length, MinLength, IsAlphanumeric, IsEmpty } from 'class-validator';
 import { Expose, Exclude, Type, Transform } from 'class-transformer';
 import { ApiModelProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { LOGIN_EMAIL, LOGIN_NAME, READ } from '../../config';
-import { IUser } from '.';
-
+import { IUser, RoleEnum } from '.';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -33,6 +32,9 @@ export class User implements IUser {
   @Column()
   password: string;
 
+  @Column()
+  role: RoleEnum;
+
   @Expose({ groups: [READ] })
   @CreateDateColumn()
   @ApiModelProperty({ type: String, readOnly: true, format: 'date-time' })
@@ -46,6 +48,7 @@ export class User implements IUser {
   @BeforeInsert()
   async beforeInsert() {
     const now = new Date();
+    this.role = RoleEnum.USER;
     this.createdAt = now;
     this.updatedAt = now;
     this.password = await bcrypt.hash(this.password, process.env.SALT_ROUNDS || 12);

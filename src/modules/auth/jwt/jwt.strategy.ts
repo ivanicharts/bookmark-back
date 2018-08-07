@@ -12,8 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @Inject('jwt') private readonly JWT: IJwtConfig,
   ) {
     super({
-      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      jwtFromRequest: (req) => console.log('cq', req.headers, Object.keys(req)),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: JWT.secret,
     });
   }

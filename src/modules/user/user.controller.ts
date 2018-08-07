@@ -1,22 +1,25 @@
 import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UserService, User } from './';
+import { RoleEnum } from './interface';
+import { Roles } from './../../common/decorator'
 import { TransformClassToPlain } from 'class-transformer';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../../guard'
 
 @Controller('/api/v1/user')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
 
     constructor(private readonly userService: UserService) {}
 
     @Get('/list')
-    @UseGuards(AuthGuard('jwt'))
+    @Roles(RoleEnum.ADMIN)
     @TransformClassToPlain({ groups: ['read'] })
-    list(): Promise<User[]> {
+    list(@Req() req): Promise<User[]> {
         return this.userService.list();
     }
 
     @Get('/profile')
-    @UseGuards(AuthGuard('jwt'))
     @TransformClassToPlain({ groups: ['read'] })
     get(@Req() req): User {
         return req.user;
