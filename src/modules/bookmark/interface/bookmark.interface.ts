@@ -5,15 +5,25 @@ export enum StatusEnum {
     ARCHIVE = 1,
 }
 
-export interface IBookmark {
+export class IBookmarkSHared {
     readonly id: ObjectID;
     title: string;
-    description: string;
-    imageUrl: string;
-    tags: string[];
+    description?: string;
+    imageUrl?: string;
+    tags?: string[];
     userId: ObjectID;
-    favorite: boolean;
+    url: string;
+    readonly createdAt?: Date | string;
+    readonly updatedAt?: Date | string;
+}
+
+export interface IBookmark extends IBookmarkSHared {
+    favorite?: boolean;
     status: StatusEnum;
-    readonly createdAt: Date | string,
-    readonly updatedAt: Date | string,
+}
+
+export enum GroupEnum {
+    SHARED = 'shared',
+    PRIVATE = 'private',
+    ADD = 'add',
 }
