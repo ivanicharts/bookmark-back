@@ -2,11 +2,10 @@ import { Exclude, Expose } from 'class-transformer';
 import { ObjectID, Tree } from 'typeorm';
 import {
     IsNotEmpty, IsMongoId, IsUrl, Length, IsString, IsOptional,
-    IsArray, ArrayMaxSize, ArrayContains, IsBase64, IsBoolean, IsEnum
+    IsArray, ArrayMaxSize, ArrayContains, IsBase64, IsBoolean, IsEnum, IsNumber
 } from 'class-validator';
 
 import { IBookmark, StatusEnum, GroupEnum } from '../interface';
-
 @Exclude()
 export class BookmarkModel implements IBookmark {
 
@@ -20,9 +19,9 @@ export class BookmarkModel implements IBookmark {
     @IsNotEmpty()
     userId: ObjectID;
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsUrl(null, { groups: [GroupEnum.ADD] })
-    @Length(3, 255, { groups: [GroupEnum.ADD]})
+    @Expose()
+    @IsUrl({}, { always: true })
+    @Length(3, 255, { always: true })
     url: string;
 
     @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
@@ -50,16 +49,19 @@ export class BookmarkModel implements IBookmark {
     @IsOptional()
     tags?: string[];
 
+    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsNumber()
+    @IsOptional()
+    savedCount: number;
+
     @Expose({ groups: [GroupEnum.PRIVATE] })
-    @Expose({ groups: ['asd'] })
     @IsOptional()
     @IsBoolean()
     favorite?: boolean;
 
     @Expose({ groups: [GroupEnum.PRIVATE] })
+    @IsOptional()
     @IsEnum(StatusEnum)
     status: StatusEnum
 
 } 
-
-console.log(BookmarkModel)

@@ -46,10 +46,9 @@ export class AuthController {
             ...bodyValidation,
             groups: [LOGIN_NAME],
         })) credentials: User,
-        @Res() res,
     ): Promise<ILoginSuccess> {
         const loginSuccess: ILoginSuccess = await this.authService.loginByName(credentials);
-
+        
         return loginSuccess;
     }
 
