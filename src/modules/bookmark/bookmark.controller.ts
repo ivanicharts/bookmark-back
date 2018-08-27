@@ -1,15 +1,16 @@
-import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards, BadRequestException } from '@nestjs/common';
 import { GroupEnum } from './interface';
 import { Roles, reccursiveDecode } from './../../common';
-import { TransformClassToPlain, plainToClass } from 'class-transformer';
+import { TransformClassToPlain, plainToClass, classToPlain } from 'class-transformer';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../guard'
 import { BookmarkService } from './bookmark.service';
 import { RoleEnum } from '../user';
 import { bodyValidation } from '../../config';
 import { BookmarkEntity } from './entity';
+import { BookmarkModel } from './model';
 import { Transport, Client, ClientProxy } from '@nestjs/microservices';
-import { validate } from 'class-validator';
+import { validate, ValidationError } from 'class-validator';
 
 @Controller('/api/v1/bookmark')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -28,24 +29,47 @@ export class BookmarkController {
             groups: [GroupEnum.ADD],
         })) bookmark: BookmarkEntity,
         @Req() req,
-    ) {
-        console.log('bookmark', bookmark);
-        console.log('sss', req.user);
+    ): Promise<BookmarkEntity> {
+        const { id: userId } = req.user;
+        const { url } = bookmark;
         
-        const metadata = JSON.parse(decodeURI(await this.client.send('getMetadataFromUrl', bookmark).toPromise()));
-        console.log('metadata', metadata);
+        const existingBookmarkForCurrentUser = await this.bookmarkService.findOne({ url, userId: String(userId) });
+        const existingBookmark = existingBookmarkForCurrentUser || await this.bookmarkService.findOne(bookmark);
+
+        const resolvedMetadata = existingBookmark
+            ? classToPlain(existingBookmark, { groups: [GroupEnum.COPY] } )
+            : JSON.parse(decodeURI(await this.client.send('getMetadataFromUrl', bookmark).toPromise()));
+
+        const metadata: Partial<BookmarkEntity> = {
+            ...resolvedMetadata,
+            userId: String(userId),
+            url: bookmark.url,
+        }
+
         const Bookmark = plainToClass(BookmarkEntity, metadata, { groups: [GroupEnum.PRIVATE] });
-        // metadata.userId = req.user.id;
         
-        // await this.bookmarkService.create(metadata);
+        if (existingBookmarkForCurrentUser) {
+            Bookmark._id = existingBookmarkForCurrentUser._id;
+            Bookmark.status = 1;
+        }
 
-        console.log('BB', Bookmark)
+        const validationErrors: ValidationError[] = await validate(Bookmark, { 
+            groups: [GroupEnum.PRIVATE, ...(existingBookmarkForCurrentUser ? [GroupEnum.UPDATE] : [])], 
+            whitelist: true, 
+            forbidUnknownValues: true, 
+            forbidNonWhitelisted: true, 
+            skipMissingProperties: false,
+            validationError: { target: false } 
+        });
+        
+        if (validationErrors.length) {
+            throw new BadRequestException(validationErrors, 'Validation error');
+        }
 
-        Bookmark.asd = 'asd';
-
-        const validated = await validate(Bookmark, { groups: [GroupEnum.PRIVATE] });
-
-        console.log('vaaal', validated);
+        // TODO: check why default status is not applied
+        // TODO: check why if add unique, it's still not unique
+        // TODO: prevent if user sends 2+ requests for same url at the same time (maybe queue per user ?)
+        await this.bookmarkService.create(Bookmark);
 
         return Bookmark;
     }

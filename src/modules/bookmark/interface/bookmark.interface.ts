@@ -1,17 +1,17 @@
 import { ObjectID } from 'typeorm';
 
 export enum StatusEnum {
-    ACTIVE = 0,
-    ARCHIVE = 1,
+    ACTIVE = 1,
+    ARCHIVE = 0,
 }
 
 export class IBookmarkSHared {
-    readonly id: ObjectID;
+    readonly _id: ObjectID;
     title: string;
     description?: string;
     imageUrl?: string;
     tags?: string[];
-    userId: ObjectID;
+    userId: string;
     url: string;
     savedCount: number;
     readonly createdAt?: Date | string;
@@ -24,7 +24,12 @@ export interface IBookmark extends IBookmarkSHared {
 }
 
 export enum GroupEnum {
+    COPY = 'copy',
+    UPDATE = 'update',
+    READ = 'read',
     SHARED = 'shared',
     PRIVATE = 'private',
     ADD = 'add',
+    RESOLVE = 'resolve',
+    PRIVATE_SAVE = 'private/add'
 }

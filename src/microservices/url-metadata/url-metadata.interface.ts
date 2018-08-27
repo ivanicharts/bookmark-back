@@ -1,7 +1,7 @@
 export interface DefaultResolveFields {
     title: string;
     description: string;
-    url: string
+    imageUrl: string
 }
 
 export interface RequestBody {

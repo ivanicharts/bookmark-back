@@ -6,7 +6,7 @@ import { BookmarkEntity } from '.';
 @Entity('bookmarks.shared')
 export class BookmarkSharedEntity extends BookmarkEntity implements IBookmarkSHared {
     
-    @Column()
+    @Column({ default:0 })
     savedCount: number;
 
 }

@@ -11,7 +11,7 @@ export class UrlMetadataService {
     defaultFields: DefaultResolveFields = {
         title: '[property="og:title"]',
         description: '[property="og:description"]',
-        url: '[property="og:image"]',
+        imageUrl: '[property="og:image"]',
     }
 
     async resolveMetadataFromUrl({ url }: UrlMetadataDto): Promise<object> {

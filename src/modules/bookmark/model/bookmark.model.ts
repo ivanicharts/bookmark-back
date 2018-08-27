@@ -9,59 +9,64 @@ import { IBookmark, StatusEnum, GroupEnum } from '../interface';
 @Exclude()
 export class BookmarkModel implements IBookmark {
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsNotEmpty()
-    @IsMongoId()
-    id: ObjectID;
+    @Expose({ groups: [GroupEnum.READ, GroupEnum.UPDATE] })
+    @IsNotEmpty({ groups: [GroupEnum.UPDATE] })
+    // @IsMongoId({ groups: [GroupEnum.PRIVATE] })
+    _id: ObjectID;
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsMongoId()
-    @IsNotEmpty()
-    userId: ObjectID;
+    @Expose({ groups: [GroupEnum.PRIVATE_SAVE, GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsMongoId({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsNotEmpty({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    userId: string;
 
     @Expose()
     @IsUrl({}, { always: true })
     @Length(3, 255, { always: true })
     url: string;
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsString()
+    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    @IsString({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     @Length(3, 255)
     title: string;
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsString()
+    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    @IsString({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     @Length(3, 1000)
-    @IsOptional()
+    @IsOptional({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     description?: string;
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsUrl()
-    @IsOptional()
+    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    @IsUrl({}, { groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsOptional({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     @Length(3, 255)
     imageUrl?: string;
 
     @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsArray()
-    @ArrayMaxSize(10)
-    @Length(1, 15, { each: true })
-    @IsString({ each: true })
-    @IsOptional()
+    @IsArray({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @ArrayMaxSize(10, { groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @Length(1, 15, { each: true, groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsString({ each: true, groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
+    @IsOptional({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     tags?: string[];
 
-    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
-    @IsNumber()
-    @IsOptional()
+    @Expose({ groups: [GroupEnum.SHARED] })
+    @IsNumber({}, { groups: [GroupEnum.SHARED]})
+    @IsOptional({ groups: [GroupEnum.SHARED]})
     savedCount: number;
 
     @Expose({ groups: [GroupEnum.PRIVATE] })
-    @IsOptional()
+    @IsOptional({ groups: [GroupEnum.PRIVATE] })
     @IsBoolean()
     favorite?: boolean;
 
     @Expose({ groups: [GroupEnum.PRIVATE] })
-    @IsOptional()
-    @IsEnum(StatusEnum)
-    status: StatusEnum
+    @IsOptional({ groups: [GroupEnum.PRIVATE] })
+    @IsEnum(StatusEnum, { groups: [GroupEnum.PRIVATE] })
+    status: StatusEnum;
 
+    @Expose({ groups: [GroupEnum.READ] })
+    createdAt: Date
+
+    @Expose({ groups: [GroupEnum.READ] })
+    updatedAt: Date
 } 

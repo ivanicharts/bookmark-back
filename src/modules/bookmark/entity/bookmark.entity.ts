@@ -6,14 +6,15 @@ import { BookmarkModel } from '../model'
 import { ApiModelProperty } from '@nestjs/swagger';
 
 @Entity('bookmarks')
+@Index(['url', 'userId'], { unique: true })
 export class BookmarkEntity extends BookmarkModel {
 
-    @Type(() => String)
+    // @Type(() => String)
     @ApiModelProperty({ type: ObjectID, readOnly: true })
     @ObjectIdColumn()
-    id: ObjectID;
+    _id: ObjectID;
 
-    @Column()
+    @Column({ unique: true })
     url: string;
 
     @ApiModelProperty({ type: String, required: true, minLength: 3, maxLength: 255 })
@@ -38,7 +39,7 @@ export class BookmarkEntity extends BookmarkModel {
 
     @ApiModelProperty({ type: ObjectID, required: true })
     @Column()
-    userId: ObjectID;
+    userId: string;
 
     @ApiModelProperty({ type: String, enum: Object.keys(StatusEnum) })
     @Column({ default: StatusEnum.ACTIVE })

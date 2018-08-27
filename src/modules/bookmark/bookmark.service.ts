@@ -16,6 +16,10 @@ export class BookmarkService {
     //     return this.userRepository.findOneOrFail(id);
     // }
 
+    async findOne(criteria: Partial<BookmarkEntity>): Promise<Partial<BookmarkEntity>> {
+        return this.bookmarkRepository.findOne(criteria);
+    }
+
     async create(bookmark: BookmarkEntity): Promise<BookmarkEntity> {
         try {
             return (await this.bookmarkRepository.save(bookmark));
