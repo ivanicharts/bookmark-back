@@ -17,6 +17,10 @@ export class BookmarkEntity extends BookmarkModel {
     @Column({ unique: true })
     url: string;
 
+    @ApiModelProperty({ type: String, required: true })
+    @Column()
+    domain: string;
+
     @ApiModelProperty({ type: String, required: true, minLength: 3, maxLength: 255 })
     @Column()
     title: string;

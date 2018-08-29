@@ -14,9 +14,12 @@ export class UrlMetadataService {
         imageUrl: '[property="og:image"]',
     }
 
+    
     async resolveMetadataFromUrl({ url }: UrlMetadataDto): Promise<object> {
         const html = await rp(url);
-        const metadata = UrlMetadataService.resolveMetadata<DefaultResolveFields>(html, this.defaultFields);
+        const metadata = {
+            ...UrlMetadataService.resolveMetadata<DefaultResolveFields>(html, this.defaultFields),
+        };
 
         return metadata;
     }

@@ -25,6 +25,11 @@ export class BookmarkModel implements IBookmark {
     url: string;
 
     @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    @IsUrl({}, { groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    @Length(2, 100, { groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
+    domain: string;
+
+    @Expose({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED, GroupEnum.COPY] })
     @IsString({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })
     @Length(3, 255)
     title: string;

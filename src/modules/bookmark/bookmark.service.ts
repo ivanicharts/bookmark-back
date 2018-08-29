@@ -8,8 +8,10 @@ import { ObjectID } from 'typeorm';
 export class BookmarkService {
     constructor(@Inject('BookmarkRepository') private readonly bookmarkRepository: BookmarkRepository) {}
 
-    listByUserId(): Promise<BookmarkEntity[]> {
-        return this.bookmarkRepository.find();
+    listByUserId(id: string): Promise<BookmarkEntity[]> {
+        console.log('id', typeof id);
+        // TODO transform user.id to string, HOW ???
+        return this.bookmarkRepository.find({ userId: "5b86a6b8b4bd1b0d4267e88f" });
     }
 
     // findOneById(id: ObjectID): Promise<User> {

@@ -1,16 +1,17 @@
 import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards, BadRequestException } from '@nestjs/common';
 import { GroupEnum } from './interface';
-import { Roles, reccursiveDecode } from './../../common';
+import { Roles, User } from './../../common';
 import { TransformClassToPlain, plainToClass, classToPlain } from 'class-transformer';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../guard'
 import { BookmarkService } from './bookmark.service';
-import { RoleEnum } from '../user';
+import { RoleEnum, User as UserEntity } from '../user';
 import { bodyValidation } from '../../config';
 import { BookmarkEntity } from './entity';
 import { BookmarkModel } from './model';
 import { Transport, Client, ClientProxy } from '@nestjs/microservices';
 import { validate, ValidationError } from 'class-validator';
+import * as parse from 'url-parse';
 
 @Controller('/api/v1/bookmark')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -20,6 +21,13 @@ export class BookmarkController {
 
     @Client({ transport: Transport.TCP, options: { port: 1338 } })
     client: ClientProxy;
+
+    @Get('/list')
+    @Roles(RoleEnum.USER)
+    async list(@User() user: UserEntity): Promise<BookmarkEntity[]> {
+        console.log('ZZ', await this.bookmarkService.listByUserId(user.id))
+        return this.bookmarkService.listByUserId(user.id);
+    }
 
     @Post()
     @Roles(RoleEnum.USER)
@@ -32,11 +40,11 @@ export class BookmarkController {
     ): Promise<BookmarkEntity> {
         const { id: userId } = req.user;
         const { url } = bookmark;
-        
+
         const existingBookmarkForCurrentUser = await this.bookmarkService.findOne({ url, userId: String(userId) });
         const existingBookmark = existingBookmarkForCurrentUser || await this.bookmarkService.findOne(bookmark);
 
-        const resolvedMetadata = existingBookmark
+        const resolvedMetadata: Partial<BookmarkEntity> = existingBookmark
             ? classToPlain(existingBookmark, { groups: [GroupEnum.COPY] } )
             : JSON.parse(decodeURI(await this.client.send('getMetadataFromUrl', bookmark).toPromise()));
 
@@ -44,6 +52,7 @@ export class BookmarkController {
             ...resolvedMetadata,
             userId: String(userId),
             url: bookmark.url,
+            domain: parse(url).hostname,
         }
 
         const Bookmark = plainToClass(BookmarkEntity, metadata, { groups: [GroupEnum.PRIVATE] });

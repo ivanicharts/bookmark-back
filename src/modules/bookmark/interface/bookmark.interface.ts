@@ -13,6 +13,7 @@ export class IBookmarkSHared {
     tags?: string[];
     userId: string;
     url: string;
+    domain: string;
     savedCount: number;
     readonly createdAt?: Date | string;
     readonly updatedAt?: Date | string;
