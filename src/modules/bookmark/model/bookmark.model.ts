@@ -11,8 +11,9 @@ export class BookmarkModel implements IBookmark {
 
     @Expose({ groups: [GroupEnum.READ, GroupEnum.UPDATE] })
     @IsNotEmpty({ groups: [GroupEnum.UPDATE] })
-    // @IsMongoId({ groups: [GroupEnum.PRIVATE] })
-    _id: ObjectID;
+    // @IsMongoId({ groups: [GroupEnum.UPDATE] })
+    // @IsString({ groups: [GroupEnum.UPDATE] })
+    id: ObjectID;
 
     @Expose({ groups: [GroupEnum.PRIVATE_SAVE, GroupEnum.PRIVATE, GroupEnum.SHARED] })
     @IsMongoId({ groups: [GroupEnum.PRIVATE, GroupEnum.SHARED] })

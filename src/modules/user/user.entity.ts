@@ -8,7 +8,6 @@ import { IUser, RoleEnum } from '.';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
-
   @Type(() => String)
   @ApiModelProperty({ type: String, readOnly: true })
   @ObjectIdColumn()
@@ -63,6 +62,11 @@ export class User implements IUser {
 
   async validatePassword(plainPassword: string) {
     return await bcrypt.compare(plainPassword, this.password);
+  }
+
+  @Expose()
+  getId(): string {
+    return String(this.id);
   }
 
 }

@@ -6,7 +6,7 @@ export enum StatusEnum {
 }
 
 export class IBookmarkSHared {
-    readonly _id: ObjectID;
+    readonly id: ObjectID;
     title: string;
     description?: string;
     imageUrl?: string;

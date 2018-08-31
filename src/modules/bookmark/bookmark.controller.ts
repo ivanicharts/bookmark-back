@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards, BadRequestException } from '@nestjs/common';
-import { GroupEnum } from './interface';
+import { Controller, Get, Post, Param, Req, Body, Query, Res, ValidationPipe, UseGuards, BadRequestException, Delete } from '@nestjs/common';
+import { GroupEnum, StatusEnum } from './interface';
 import { Roles, User } from './../../common';
 import { TransformClassToPlain, plainToClass, classToPlain } from 'class-transformer';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../guard'
-import { BookmarkService } from './bookmark.service';
 import { RoleEnum, User as UserEntity } from '../user';
 import { bodyValidation } from '../../config';
+import { BookmarkService } from './bookmark.service';
 import { BookmarkEntity } from './entity';
 import { BookmarkModel } from './model';
+// import { BookmarkEntity, BookmarkModel, BookmarkService } from './'
 import { Transport, Client, ClientProxy } from '@nestjs/microservices';
 import { validate, ValidationError } from 'class-validator';
 import * as parse from 'url-parse';
@@ -25,8 +26,13 @@ export class BookmarkController {
     @Get('/list')
     @Roles(RoleEnum.USER)
     async list(@User() user: UserEntity): Promise<BookmarkEntity[]> {
-        console.log('ZZ', await this.bookmarkService.listByUserId(user.id))
-        return this.bookmarkService.listByUserId(user.id);
+        return this.bookmarkService.listByUserId(user.getId());
+    }
+
+    @Delete('/:id')
+    @Roles(RoleEnum.USER)
+    delete(@User() user: UserEntity, @Param('id') id: string) {
+        return this.bookmarkService.delete(user.getId(), id);
     }
 
     @Post()
@@ -35,31 +41,32 @@ export class BookmarkController {
         @Body(new ValidationPipe({
             ...bodyValidation,
             groups: [GroupEnum.ADD],
-        })) bookmark: BookmarkEntity,
-        @Req() req,
+        })) data: BookmarkEntity,
+        @User() user: UserEntity,
     ): Promise<BookmarkEntity> {
-        const { id: userId } = req.user;
-        const { url } = bookmark;
+        const userId = user.getId();
+        const { url } = data;
 
-        const existingBookmarkForCurrentUser = await this.bookmarkService.findOne({ url, userId: String(userId) });
-        const existingBookmark = existingBookmarkForCurrentUser || await this.bookmarkService.findOne(bookmark);
+        const existingBookmarkForCurrentUser = await this.bookmarkService.findOne({ url, userId });
+        const existingBookmark = existingBookmarkForCurrentUser || await this.bookmarkService.findOne(data);
 
         const resolvedMetadata: Partial<BookmarkEntity> = existingBookmark
             ? classToPlain(existingBookmark, { groups: [GroupEnum.COPY] } )
-            : JSON.parse(decodeURI(await this.client.send('getMetadataFromUrl', bookmark).toPromise()));
+            : JSON.parse(decodeURI(await this.client.send('getMetadataFromUrl', data).toPromise()));
 
         const metadata: Partial<BookmarkEntity> = {
             ...resolvedMetadata,
-            userId: String(userId),
-            url: bookmark.url,
+            url,
+            userId,
             domain: parse(url).hostname,
+            status: StatusEnum.ACTIVE,
         }
 
         const Bookmark = plainToClass(BookmarkEntity, metadata, { groups: [GroupEnum.PRIVATE] });
-        
+
+        // If user have bookmark, just update with status ACTIVE
         if (existingBookmarkForCurrentUser) {
-            Bookmark._id = existingBookmarkForCurrentUser._id;
-            Bookmark.status = 1;
+            Bookmark.id = existingBookmarkForCurrentUser.id;
         }
 
         const validationErrors: ValidationError[] = await validate(Bookmark, { 
@@ -72,15 +79,14 @@ export class BookmarkController {
         });
         
         if (validationErrors.length) {
-            throw new BadRequestException(validationErrors, 'Validation error');
+            throw new BadRequestException(validationErrors);
         }
 
-        // TODO: check why default status is not applied
-        // TODO: check why if add unique, it's still not unique
-        // TODO: prevent if user sends 2+ requests for same url at the same time (maybe queue per user ?)
-        await this.bookmarkService.create(Bookmark);
-
-        return Bookmark;
+        // TODO: check why default status is not applied - seems not implemented yet
+        // TODO: check why if add unique, it's still not unique - seems not implemented yet
+        // TODO: prevent if user sends 2+ requests for same url at the same time (maybe queue per user ?) - solved by creatin
+        // unique idndex for url + userId
+        return await this.bookmarkService.create(Bookmark);
     }
 
 }
