@@ -15,7 +15,6 @@ interface ISuccessResponseArgs {
     data?: any;
 }
 
-
 export interface ISuccessResponse<T> {
     status: boolean;
     statusCode: number;

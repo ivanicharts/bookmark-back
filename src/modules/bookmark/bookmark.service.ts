@@ -8,17 +8,15 @@ import { SuccessResponse, FailResponse, ISuccessResponse } from '../../common/re
 export class BookmarkService {
     constructor(@Inject('BookmarkRepository') private readonly bookmarkRepository: BookmarkRepository) {}
 
-    // Promise<BookmarkEntity[]>
-    async listByUserId(userId: string): Promise<ISuccessResponse<BookmarkEntity[]>> {
-        // return (await this.bookmarkRepository.find({ userId })) ;
-        return new SuccessResponse({ data: await this.bookmarkRepository.find({ userId }) }) ;
+    // async listByUserId(userId: string): Promise<ISuccessResponse<BookmarkEntity[]>> {
+    listByUserId(userId: string): Promise<BookmarkEntity[]> {
+        return this.bookmarkRepository.find({ userId });
+        // return new SuccessResponse({ data: await this.bookmarkRepository.find({ userId }) }) ;
     }
 
     // findOneById(id: ObjectID): Promise<User> {
     //     return this.userRepository.findOneOrFail(id);
     // }
-
-
 
     findOne(criteria: Partial<BookmarkEntity>): Promise<Partial<BookmarkEntity>> {
         return this.bookmarkRepository.findOne(criteria);
@@ -33,7 +31,7 @@ export class BookmarkService {
     }
 
     async delete(userId: string, bookmarkId: string) {
-        try {
+        // try {
             const bookmark = await this.bookmarkRepository.findOneOrFail(bookmarkId);
             if (bookmark.userId === userId) {
                 const removeResult = await this.bookmarkRepository.remove(bookmark);
@@ -43,8 +41,8 @@ export class BookmarkService {
                 throw new BadRequestException();
             }
             throw new ForbiddenException();
-        } catch (error) {
-            return new FailResponse(error);
-        }
+        // } catch (error) {
+        //     return new FailResponse(error);
+        // }
     }
 }

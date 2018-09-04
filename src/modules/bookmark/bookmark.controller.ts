@@ -86,7 +86,7 @@ export class BookmarkController {
         // TODO: check why if add unique, it's still not unique - seems not implemented yet
         // TODO: prevent if user sends 2+ requests for same url at the same time (maybe queue per user ?) - solved by creatin
         // unique idndex for url + userId
-        return await this.bookmarkService.create(Bookmark);
+        return this.bookmarkService.create(Bookmark);
     }
 
 }
