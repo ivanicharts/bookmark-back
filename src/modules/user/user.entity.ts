@@ -8,15 +8,15 @@ import { IUser, RoleEnum } from '.';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
-
   @Type(() => String)
   @ApiModelProperty({ type: String, readOnly: true })
   @ObjectIdColumn()
-  id: ObjectID;
+  id: string;
 
   @IsEmail({}, { groups: [LOGIN_EMAIL] })
   @ApiModelProperty({ type: String, required: true, example: 'user@email.com' })
   @Column({ unique: true })
+  @Index({ unique: true })
   email: string;
 
   @IsString({ groups: [LOGIN_NAME] })
@@ -24,6 +24,7 @@ export class User implements IUser {
   @Length(3, 20, { groups: [LOGIN_NAME] })
   @ApiModelProperty({ type: String, required: true, minLength: 3, maxLength: 20, format: 'alphanumeric' })
   @Column({ unique: true })
+  @Index({ unique: true })
   name: string;
 
   @Length(6, 255, { groups: [LOGIN_NAME, LOGIN_EMAIL] })
@@ -61,6 +62,11 @@ export class User implements IUser {
 
   async validatePassword(plainPassword: string) {
     return await bcrypt.compare(plainPassword, this.password);
+  }
+
+  @Expose()
+  getId(): string {
+    return String(this.id);
   }
 
 }

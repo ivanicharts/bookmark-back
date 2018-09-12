@@ -3,6 +3,7 @@ import { AuthService } from '../auth.service';
 import { PassportStrategy } from '@nestjs/passport';
 import { Inject, UnauthorizedException, Injectable } from '@nestjs/common'; 
 import { JwtPayload, IJwtConfig } from '../interface';
+import { User } from '../../user';
 
 
 @Injectable()
@@ -18,10 +19,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate (payload: JwtPayload, done: Function): Promise<any> {
-    const user = await this.authService.validateUser(payload);
-    if (!user) {
-      return done(new UnauthorizedException(), false);
+    try {
+      const user = await this.authService.validateUser(payload);
+      if (!user) {
+        return done(new UnauthorizedException(), false);
+      }
+      console.log('qqqAAAAAAAAZZZZZZ', user, user instanceof User)
+      return done(null, user);
+    } catch (error) {
+      // TODO: add log error.stack
+      return done(new UnauthorizedException(error.message), false);
     }
-    done(null, user);
   }
 }

@@ -1,6 +1,7 @@
 import { ConnectionOptions } from 'typeorm';
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
 import { User } from './modules/user';
+import { BookmarkEntity } from './modules/bookmark';
 
 const fs = require('fs');
 const dotenv = require('dotenv');
@@ -20,7 +21,7 @@ const mongo: MongoConnectionOptions = {
     username: process.env.TYPEORM_USERNAME as string,
     password: process.env.TYPEORM_PASSWORD as string,
     database: process.env.TYPEORM_DATABASE as string,
-    entities: [User],
+    entities: [User, BookmarkEntity],
     synchronize: !!process.env.TYPEORM_SYNCHRONIZE,
     logging: !!process.env.TYPEORM_LOGGING,
 };

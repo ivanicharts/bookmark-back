@@ -9,7 +9,7 @@ export interface IEmail {
 }
 
 export interface IUser extends IName, IEmail {
-  readonly id: ObjectID,
+  readonly id: string,
   readonly password: string,
   readonly createdAt: Date | string,
   readonly updatedAt: Date | string,
