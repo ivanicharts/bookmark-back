@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (!user) {
         return done(new UnauthorizedException(), false);
       }
-      console.log('qqqAAAAAAAAZZZZZZ', user, user instanceof User)
+      // console.log('qqqAAAAAAAAZZZZZZ', user, user instanceof User)
       return done(null, user);
     } catch (error) {
       // TODO: add log error.stack

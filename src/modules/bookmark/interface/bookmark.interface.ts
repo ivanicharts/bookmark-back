@@ -34,3 +34,8 @@ export enum GroupEnum {
     RESOLVE = 'resolve',
     PRIVATE_SAVE = 'private/add'
 }
+
+export interface ITag {
+    name: string;
+    count: number;
+}

@@ -3,6 +3,8 @@ import { BookmarkRepository } from './repository';
 import { BookmarkEntity } from './entity';
 import { ObjectID } from 'mongodb';
 import { SuccessResponse, FailResponse, ISuccessResponse } from '../../common/response';
+import { LOGIN_EMAIL } from 'config';
+import { ITag } from '.';
 
 @Injectable()
 export class BookmarkService {
@@ -20,6 +22,16 @@ export class BookmarkService {
 
     findOne(criteria: Partial<BookmarkEntity>): Promise<Partial<BookmarkEntity>> {
         return this.bookmarkRepository.findOne(criteria);
+    }
+
+    tagListByUserId(userId: string): Promise<ITag[]> {
+        return this.bookmarkRepository
+            .aggregate([])
+            .match({ userId })
+            .unwind('$tags')
+            .group({ _id: '$tags', count: { $sum: 1 } })
+            .project({ name: '$_id', _id: 0, count: '$count' })
+            .toArray();
     }
 
     create(bookmark: BookmarkEntity): Promise<BookmarkEntity> {
