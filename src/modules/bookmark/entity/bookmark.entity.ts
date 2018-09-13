@@ -7,6 +7,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 
 @Entity('bookmarks')
 @Index(['url', 'userId'], { unique: true })
+// @Index("tags", { sparse: true })
 export class BookmarkEntity extends BookmarkModel {
 
     @Type(() => String)

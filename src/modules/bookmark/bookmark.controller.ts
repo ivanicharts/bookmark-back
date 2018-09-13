@@ -29,6 +29,12 @@ export class BookmarkController {
         return this.bookmarkService.listByUserId(user.getId());
     }
 
+    @Get('/tags')
+    @Roles(RoleEnum.USER)
+    async tagList(@User() user: UserEntity): Promise<object[]> {
+        return this.bookmarkService.tagListByUserId(user.getId());
+    }
+
     @Delete('/:id')
     @Roles(RoleEnum.USER)
     delete(@User() user: UserEntity, @Param('id') id: string) {
